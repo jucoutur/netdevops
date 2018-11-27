@@ -1,7 +1,7 @@
 ---
 # AppCentric Demo playbook
 - name: Build Tenant
-  hosts: apic
+  hosts: apic_appcentric
   connection: "{{ ansible_connection }}"
   gather_facts: no
 
