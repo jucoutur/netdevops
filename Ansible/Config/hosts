@@ -13,3 +13,9 @@ Parlab-Leaf2 ansible_connection=netconf ansible_network_os=nxos ansible_user=adm
 [install_nxos_cli]
 Parlab-Leaf1
 Parlab-Leaf2
+
+[apic_netcentric]
+10.60.9.225
+
+[apic_appcentric]
+10.60.9.225
