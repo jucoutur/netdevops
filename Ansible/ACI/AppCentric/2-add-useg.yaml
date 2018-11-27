@@ -1,7 +1,7 @@
 ---
 # AppCentric Demo playbook
 - name: Move Tenant to Application Centric
-  hosts: apic
+  hosts: apic_appcentric
   connection: "{{ ansible_connection }}"
   gather_facts: no
 
