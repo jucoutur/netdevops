@@ -22,8 +22,7 @@ RUN apt-get -y update && apt-get -y install \
 	python-dev \
 	libtool-bin \
 	wget \
-	subversion
-RUN echo 'upgrade pip to latest' 
+	subversion 
 RUN pip install --upgrade pip
 RUN pip install scp requests
 
