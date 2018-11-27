@@ -51,11 +51,11 @@ RUN mkdir /root/NX-API_CLI && \
 	svn checkout "https://github.com/jucoutur/netdevops/trunk/NX-API_CLI" /root/NX-API_CLI
 
 # Ansible // create a base folder for playbooks
-RUN mkdir /root/playbooks
+RUN mkdir /root/ansible
 
 # NX-OS // get Ansible playbooks & Ansible config files
-RUN mkdir /root/playbooks/nxos && \
-	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/2.5" /root/playbooks/nxos && \
+RUN mkdir /root/ansible/nxos && \
+	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/2.5" /root/ansible/nxos && \
 	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/Config" /etc/ansible/
 
 # NX-OS // overwrite existing Ansible config files
@@ -63,8 +63,8 @@ RUN	curl 'https://raw.githubusercontent.com/jucoutur/netdevops/master/Ansible/Co
 	curl 'https://raw.githubusercontent.com/jucoutur/netdevops/master/Ansible/Config/ansible.cfg' > /etc/ansible/ansible.cfg
 
 # ACI // get ACI-AVI Ansible playbooks
-RUN mkdir /root/playbooks/aci && \
-	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/ACI" /root/playbooks/aci
+RUN mkdir /root/ansible/aci && \
+	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/ACI" /root/ansible/aci
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
