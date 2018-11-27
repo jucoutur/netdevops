@@ -1,0 +1,77 @@
+##############################
+#### connection variables ####
+##############################
+
+ansible_connection=local
+username=admin
+password=cisco123
+validate_certs=no
+use_proxy=no
+use_ssl=no
+
+
+#####################################################
+#### configuration variables for Network Centric ####
+#####################################################
+
+state=present
+# options: present/absent/query
+
+tenant=NetCentric-Demo
+
+vrf=Production
+
+policy_control_preference=unenforced
+# options: unenforced/enforced
+
+bd_1=Production-Segment-200
+bd_2=Production-Segment-201
+
+enable_routing=True
+
+arp_flooding=False
+
+l2_unknown_unicast=proxy
+# options: proxy/flood
+
+ip_learning=True
+
+gateway_1=10.200.0.254
+gateway_2=10.201.0.254
+
+mask=24
+
+scope=private
+# options: private/public/shared
+
+ap=Production
+
+epg_1=Segment-200
+epg_2=Segment-201
+
+intra_epg_isolation=unenforced
+# options: unenforced/enforced
+
+priority=unspecified
+# options: level1/level2/level3/unspecified
+
+domain_type=vmm
+# options: vmm/phys
+
+vm_provider=vmware
+# options: vmware/openstack/microsoft
+
+domain=DVS_Domain
+
+deploy_immediacy=lazy
+# options: immediate/lazy
+
+resolution_immediacy=lazy
+# options: immediate/lazy/pre-provision
+
+
+physdom=Baremetals_Physical_Domain
+
+epg_bm=Segment-200
+
+bm_encap_vlan=200
