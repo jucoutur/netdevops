@@ -2,6 +2,14 @@
 Parlab-Leaf1
 Parlab-Leaf2
 
+[nxos_vteps_cli]
+Parlab-Leaf1
+Parlab-Leaf2
+
 [netconf_vteps]
 Parlab-Leaf1 ansible_connection=netconf ansible_network_os=nxos ansible_user=admin ansible_ssh_pass=cisco123
 Parlab-Leaf2 ansible_connection=netconf ansible_network_os=nxos ansible_user=admin ansible_ssh_pass=cisco123
+
+[install_nxos_cli]
+Parlab-Leaf1
+Parlab-Leaf2
