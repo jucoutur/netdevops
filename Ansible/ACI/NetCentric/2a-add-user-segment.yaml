@@ -1,7 +1,7 @@
 ---
 # NetCentric Demo playbook - add a Segment using multiple Ansible ACI network modules
 - name: Add BD/EPG to existing ANP
-  hosts: apic
+  hosts: apic_netcentric
   connection: "{{ ansible_connection }}"
   gather_facts: no
 
