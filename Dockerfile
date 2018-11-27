@@ -43,7 +43,7 @@ RUN pip install lxml && pip install xmljson
 RUN pip install pyvmomi
 
 # No caching from now on to always force latest files to be downloaded
-ADD http://worldclockapi.com/api/json/utc/now timestamp.json
+ADD http://worldclockapi.com/api/json/utc/now /tmp/timestamp.json
 
 # NX-OS // copy NX-API CLI scripts from Github repo
 RUN mkdir /root/NX-API_CLI && \
