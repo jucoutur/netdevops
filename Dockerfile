@@ -59,7 +59,7 @@ RUN mkdir /root/playbooks && mkdir /root/playbooks/nxos && \
 	svn checkout "https://github.com/jucoutur/nx-os-programmability/trunk/Ansible/2.5" /root/playbooks/nxos && \
 	svn checkout "https://github.com/jucoutur/nx-os-programmability/trunk/Ansible/Config" /etc/ansible/
 
-# NX-OS // overwrite Ansible config files from Github repo
+# NX-OS // overwrite existing Ansible config files with the ones from Github repo
 RUN	curl 'https://raw.githubusercontent.com/jucoutur/nx-os-programmability/master/Ansible/Config/hosts' > /etc/ansible/hosts  && \
 	curl 'https://raw.githubusercontent.com/jucoutur/nx-os-programmability/master/Ansible/Config/ansible.cfg' > /etc/ansible/ansible.cfg
 
