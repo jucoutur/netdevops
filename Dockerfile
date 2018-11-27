@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.10.1
-LABEL maintainer="jucoutur@cisco.com"
+MAINTAINER Julien Couturier <jucoutur@cisco.com>
 
 CMD ["/bin/bash"]
 
