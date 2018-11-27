@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.10.1
-LABEL maintainer="julien.coutur@gmail.com"
+LABEL maintainer="jucoutur@cisco.com"
 
 CMD ["/bin/bash"]
 
