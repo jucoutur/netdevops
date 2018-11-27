@@ -1,0 +1,83 @@
+---
+# NetCentric Demo playbook - add a Segment using multiple Ansible ACI network modules
+- name: Add BD/EPG to existing ANP
+  hosts: apic
+  connection: "{{ ansible_connection }}"
+  gather_facts: no
+
+  vars_prompt:
+  - name: "user_tenant"
+    prompt: "Tenant"
+    default: "NetCentric-Demo"
+    private: no
+  - name: "user_env"
+    prompt: "Environnement"
+    default: "Production"
+    private: no
+  - name: "user_segment"
+    prompt: "Segment"
+    default: "205"
+    private: no
+  - name: "user_gateway"
+    prompt: "IP Default Gateway"
+    default: "10.205.0.254"
+    private: no
+  - name: "user_mask"
+    prompt: "Mask (decimal format, no /)"
+    default: "24"
+    private: no
+
+  tasks:
+
+  - name: Create BD
+    aci_bd:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ user_tenant }}"
+      vrf: "{{ user_env }}"
+      bd: "{{ user_env }}-Segment-{{ user_segment }}"
+
+  - name: Create BD Subnet 
+    aci_bd_subnet:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ user_tenant }}"
+      bd: "{{ user_env }}-Segment-{{ user_segment }}"
+      gateway: "{{ user_gateway }}"
+      mask: "{{ user_mask }}"
+
+  - name: Create EPG
+    aci_epg:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      ap: "{{ user_env }}"
+      bd: "{{ user_env }}-Segment-{{ user_segment }}"
+      epg: "Segment-{{ user_segment }}"
+
+  - name: Associate EPG to VMM Domain
+    aci_epg_to_domain:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      ap: "{{ user_env }}"
+      epg: "Segment-{{ user_segment }}"
+      domain_type: "{{ domain_type }}"
+      vm_provider: "{{ vm_provider }}"
+      domain: "{{ domain }}"
