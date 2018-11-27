@@ -1,7 +1,7 @@
 ---
 # NetCentric Demo playbook - Build tenant
 - name: Build Tenant
-  hosts: apic
+  hosts: apic_netcentric
   connection: "{{ ansible_connection }}"
   gather_facts: no
 
