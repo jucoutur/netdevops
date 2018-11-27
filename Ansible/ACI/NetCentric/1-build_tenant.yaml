@@ -1,0 +1,157 @@
+---
+# NetCentric Demo playbook - Build tenant
+- name: Build Tenant
+  hosts: apic
+  connection: "{{ ansible_connection }}"
+  gather_facts: no
+
+  tasks:
+  - name: Create Tenant
+    aci_tenant:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      state: "{{ state }}"
+
+  - name: Create VRF
+    aci_vrf:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      vrf: "{{ vrf }}"
+      policy_control_preference: unenforced
+      state: "{{ state }}"
+
+  - name: Create BD
+    aci_bd:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      vrf: "{{ vrf }}"
+      bd: "{{ item }}"
+      enable_routing: "{{ enable_routing }}"
+      arp_flooding: "{{ arp_flooding }}"
+      l2_unknown_unicast: "{{ l2_unknown_unicast }}"
+      ip_learning: "{{ ip_learning }}"
+      state: "{{ state }}"
+    with_items:
+      - "{{ bd_1 }}"
+      - "{{ bd_2 }}"
+
+  - name: Create BD Subnet 
+    aci_bd_subnet:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      bd: "{{ item.name }}"
+      gateway: "{{ item.gateway }}"
+      mask: "{{ mask }}"
+      scope: "{{ scope }}"
+      state: "{{ state }}"
+    with_items:
+      - { name: "{{ bd_1 }}", gateway: "{{ gateway_1 }}"}
+      - { name: "{{ bd_2 }}", gateway: "{{ gateway_2 }}"}
+
+  - name: Create ANP
+    aci_ap:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      ap: "{{ ap }}"
+      state: "{{ state }}"
+
+  - name: Create EPG
+    aci_epg:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      ap: "{{ ap }}"
+      bd: "{{ item.bd }}"
+      epg: "{{ item.epg }}"
+      intra_epg_isolation: "{{ intra_epg_isolation }}"
+      priority: "{{ priority }}"
+      state: "{{ state }}"
+    with_items:
+      - { bd: "{{ bd_1 }}", epg: "{{ epg_1 }}"}
+      - { bd: "{{ bd_2 }}", epg: "{{ epg_2 }}"}
+
+  - name: Associate EPG to VMM Domain
+    aci_epg_to_domain:
+      hostname: "{{ inventory_hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+      use_proxy: "{{ use_proxy }}"
+      use_ssl: "{{ use_ssl }}"
+      tenant: "{{ tenant }}"
+      ap: "{{ ap }}"
+      epg: "{{ item }}"
+      domain_type: "{{ domain_type }}"
+      vm_provider: "{{ vm_provider }}"
+      domain: "{{ domain }}"
+      deploy_immediacy: "{{ deploy_immediacy }}"
+      resolution_immediacy: "{{ resolution_immediacy }}"
+      state: "{{ state }}"
+    with_items:
+      - "{{ epg_1 }}"
+      - "{{ epg_2 }}"
+
+#  - name: Associate EPG to Physical Domain
+#    aci_epg_to_domain:
+#      hostname: "{{ inventory_hostname }}"
+#      username: "{{ username }}"
+#      password: "{{ password }}"
+#      validate_certs: "{{ validate_certs }}"
+#      use_proxy: "{{ use_proxy }}"
+#      use_ssl: "{{ use_ssl }}"
+#      tenant: "{{ tenant }}"
+#      ap: "{{ ap }}"
+#      epg: "{{ epg_bm }}"
+#      domain_type: phys
+#      domain: "{{ physdom }}"
+#      deploy_immediacy: "{{ deploy_immediacy }}"
+#      resolution_immediacy: "{{ resolution_immediacy }}"
+#      state: "{{ state }}"
+
+#  - name: Create static path to attach BM to EPG
+#    aci_rest:
+#      hostname: "{{ inventory_hostname }}"
+#      username: "{{ username }}"
+#      password: "{{ password }}"
+#      validate_certs: "{{ validate_certs }}"
+#      use_proxy: "{{ use_proxy }}"
+#      use_ssl: "{{ use_ssl }}"
+#      path: /api/mo/uni.xml
+#      method: post
+#      content: |
+#        <fvTenant name="{{ tenant }}">
+#          <fvAp name="{{ ap }}">
+#            <fvAEPg name="{{ epg_bm }}">
+#              <fvRsPathAtt encap="vlan-{{ bm_encap_vlan }}" instrImedcy="immediate" mode="regular" tDn="topology/pod-1/protpaths-111-112/pathep-[ESX-5_VPC_Interface_Policy_Group]"/>
+#            </fvAEPg>
+#          </fvAp>
+#        </fvTenant>
