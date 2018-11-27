@@ -1,0 +1,141 @@
+---
+- name: Prepare Avi and ACI for the new service to be deployed
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  vars_files:
+    - vars/creds.yml
+    - vars/tenant_vars.yml
+
+  roles:
+    - role: avinetworks.avisdk
+
+  tasks:
+
+# Build ACI tenant and import AVI logical device
+  - name: Build ACI tenant and import AVI logical device
+    aci_rest:
+      hostname: "{{ apic_ip }}"
+      username: "{{ apic_username }}"
+      password: "{{ apic_password }}"
+      use_ssl: no
+      validate_certs: no
+      path: /api/mo/uni.xml
+      method: post
+      content: |
+        <fvTenant name="{{ Tenant }}">
+
+          <fvCtx name="{{ vrf }}"/>
+
+          <fvBD name="{{ bd_1 }}">
+            <fvSubnet ip="{{ bd_1_ip }}"/>
+            <fvRsCtx tnFvCtxName="{{ vrf }}"/>
+          </fvBD>
+
+          <vzFilter name="Http-Filter">
+            <vzEntry name="Http-Port" dFromPort="80" dToPort="80" etherT="ip" prot="6"/>
+          </vzFilter>
+          <vzFilter name="Ping-Filter">
+            <vzEntry name="ICMP" etherT="ip" prot="icmp"/>
+          </vzFilter>
+
+          <vzBrCP name="{{ Contract }}">
+            <vzSubj name="{{ subj_default }}">
+              <vzRsSubjFiltAtt tnVzFilterName="Http-Filter"/>
+              <vzRsSubjFiltAtt tnVzFilterName="Ping-Filter"/>
+            </vzSubj>
+          </vzBrCP>
+
+          <fvAp name="{{ AppProfile }}">
+            <fvAEPg name="{{ ClientEPG }}">
+              <fvRsDomAtt tDn="uni/vmmp-VMware/dom-{{ apic_VMM }}" instrImedcy="immediate" resImedcy="immediate"/>
+              <fvRsBd tnFvBDName="{{ bd_1 }}"/>
+              <fvRsCons tnVzBrCPName="{{ Contract }}"/>
+            </fvAEPg>
+            <fvAEPg name="{{ ServerEPG }}">
+              <fvRsDomAtt tDn="uni/vmmp-VMware/dom-{{ apic_VMM }}" instrImedcy="immediate" resImedcy="immediate"/>
+              <fvRsBd tnFvBDName="{{ bd_1 }}"/>
+              <fvRsProv tnVzBrCPName="{{ Contract }}"/>
+            </fvAEPg>
+          </fvAp>
+
+          <vnsLDevIf ldev="uni/tn-common/lDevVip-{{ avi_device }}"/>
+
+        </fvTenant> 
+    delegate_to: localhost
+
+# Pause to make sure ACI config has been synced to vCenter and Avi Manager
+  - pause:
+      seconds: 5
+      prompt: "Pause to make sure ACI config has been synced to vCenter and Avi Manager"
+
+# Configure IP range for the SEs in the network discovered in the ACI tenant 
+  - name: Add static range for networks
+    avi_network:
+      api_version: "{{ api_version }}"
+      avi_credentials: "{{ avi_credentials }}"
+      name: "{{ Tenant }}:{{ item.bd }}"
+      vrf_context_ref: '/api/vrfcontext/?name=global'
+      tenant_ref: '/api/tenant/?name=admin' # 18.1.3 - ACI synced networks are in admin tenant 
+      cloud_ref: "/api/cloud/?name={{ AviCloudName }}"
+      configured_subnets:
+        - prefix:
+            ip_addr:
+              type: V4
+              addr: "{{ item.subnet }}"
+            mask: "{{ item.subnet_mask }}"
+          static_ranges:
+          - begin:
+              type: V4
+              addr: "{{ item.start_addr }}"
+            end:
+              type: V4
+              addr: "{{ item.end_addr }}"
+      exclude_discovered_subnets: false
+      dhcp_enabled: false
+      #vcenter_dvs: true
+    loop:
+      - { bd: "{{ bd_1 }}", subnet: "{{ bd_1_subnet }}", subnet_mask: "{{ bd_1_subnet_mask }}", start_addr: "{{ bd_1_subnet_start_addr }}", end_addr: "{{ bd_1_subnet_end_addr }}" }
+#        - { bd: "{{ bd_2 }}", subnet: "{{ bd_2_subnet }}", subnet_mask: "{{ bd_2_subnet_mask }}", start_addr: "{{ bd_2_subnet_start_addr }}", end_addr: "{{ bd_2_subnet_end_addr }}" }
+
+# Configure the Avi VS
+  - name: Setting up Application
+    include_role:
+      name: avinetworks.aviconfig
+    vars:
+      avi_config_file: "app_config.yml"
+      avi_creds_file: "vars/creds.yml"
+
+# Attach VMs to ACI created Port-Groups
+  - name: Attach front-end VMs to ACI created Port-Groups
+    vmware_guest:
+      hostname: "{{ vcenter_ip }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      name: "{{ item }}"
+      datacenter: "{{ vcenter_dc }}"
+      folder: "{{ vcenter_vm_folder }}"
+      state: present
+      networks:
+      - name: "{{ Tenant }}|{{ AppProfile }}|{{ ClientEPG }}"
+    with_items:
+      - "{{ Frontend_1 }}"
+    delegate_to: localhost
+
+  - name: Attach back-end VMs to ACI created Port-Groups
+    vmware_guest:
+      hostname: "{{ vcenter_ip }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: no
+      name: "{{ item }}"
+      datacenter: "{{ vcenter_dc }}"
+      folder: "{{ vcenter_vm_folder }}"
+      state: present
+      networks:
+      - name: "{{ Tenant }}|{{ AppProfile }}|{{ ServerEPG }}"
+    with_items:
+      - "{{ Backend_1 }}"
+      - "{{ Backend_2 }}"
+    delegate_to: localhost
