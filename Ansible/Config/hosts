@@ -1,8 +1,8 @@
-[nxos_vteps]
+[nxos_vteps_cli]
 Parlab-Leaf1
 Parlab-Leaf2
 
-[nxos_vteps_cli]
+[nxos_vteps_api]
 Parlab-Leaf1
 Parlab-Leaf2
 
