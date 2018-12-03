@@ -116,7 +116,7 @@
       networks:
       - name: "{{ Tenant }}|{{ AppProfile }}|{{ ClientEPG }}"
     with_items:
-      - "{{ Frontend_1 }}"
+      - "{{ Frontends }}"
     delegate_to: localhost
 
   - name: Attach back-end VMs to ACI created Port-Groups
@@ -132,6 +132,5 @@
       networks:
       - name: "{{ Tenant }}|{{ AppProfile }}|{{ ServerEPG }}"
     with_items:
-      - "{{ Backend_1 }}"
-      - "{{ Backend_2 }}"
+      - "{{ Backends }}"
     delegate_to: localhost
