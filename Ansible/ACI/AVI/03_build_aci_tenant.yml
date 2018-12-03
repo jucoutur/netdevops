@@ -21,8 +21,8 @@
 
           <fvCtx name="{{ vrf }}"/>
 
-          <fvBD name="{{ bd_1 }}">
-            <fvSubnet ip="{{ bd_1_ip }}"/>
+          <fvBD name="{{ bd }}">
+            <fvSubnet ip="{{ bd_ip }}"/>
             <fvRsCtx tnFvCtxName="{{ vrf }}"/>
           </fvBD>
 
@@ -43,12 +43,12 @@
           <fvAp name="{{ AppProfile }}">
             <fvAEPg name="{{ ClientEPG }}">
               <fvRsDomAtt tDn="uni/vmmp-VMware/dom-{{ apic_VMM }}" instrImedcy="immediate" resImedcy="immediate"/>
-              <fvRsBd tnFvBDName="{{ bd_1 }}"/>
+              <fvRsBd tnFvBDName="{{ bd }}"/>
               <fvRsCons tnVzBrCPName="{{ Contract }}"/>
             </fvAEPg>
             <fvAEPg name="{{ ServerEPG }}">
               <fvRsDomAtt tDn="uni/vmmp-VMware/dom-{{ apic_VMM }}" instrImedcy="immediate" resImedcy="immediate"/>
-              <fvRsBd tnFvBDName="{{ bd_1 }}"/>
+              <fvRsBd tnFvBDName="{{ bd }}"/>
               <fvRsProv tnVzBrCPName="{{ Contract }}"/>
             </fvAEPg>
           </fvAp>
