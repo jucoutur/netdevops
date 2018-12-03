@@ -13,12 +13,12 @@ Backend_3: App3
 
 # Networking parameters
 vrf: Default-VRF
-bd_1: IP-Namespace-BD
-bd_1_ip: 110.0.0.254/24
-bd_1_subnet: 110.0.0.0
-bd_1_subnet_mask: 24
-bd_1_subnet_start_addr: 110.0.0.200
-bd_1_subnet_end_addr: 110.0.0.210
+bd: IP-Namespace-BD
+bd_ip: 110.0.0.254/24
+bd_subnet: 110.0.0.0
+bd_subnet_mask: 24
+bd_subnet_start_addr: 110.0.0.200
+bd_subnet_end_addr: 110.0.0.210
 
 # Service Graph parameters
 Contract: PRD-Contract
