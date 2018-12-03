@@ -1,0 +1,32 @@
+# tenant variables
+# update accordingly
+
+# Segmentation parameters
+Tenant: Demo
+AppProfile: PRD
+ClientEPG: Web
+ServerEPG: App
+Frontend_1: Web1
+Backend_1: App1
+Backend_2: App2
+Backend_3: App3
+
+# Networking parameters
+vrf: Default-VRF
+bd_1: IP-Namespace-BD
+bd_1_ip: 110.0.0.254/24
+bd_1_subnet: 110.0.0.0
+bd_1_subnet_mask: 24
+bd_1_subnet_start_addr: 110.0.0.200
+bd_1_subnet_end_addr: 110.0.0.210
+
+# Service Graph parameters
+Contract: PRD-Contract
+ServiceGraph: AviLayer2Graph
+subj_default: Default-Subject
+subj_to_avi: To-AVI-LB
+
+# Avi parameters
+appaci_vip: 110.0.0.123
+app_name: MyNewApp-VS
+avi_device: Avi_5dd858e6_29aa
