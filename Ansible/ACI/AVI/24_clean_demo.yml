@@ -8,26 +8,6 @@
 
   tasks:
 
-# remove Avi Service Graph
-  - name: Remove AVI Service Graph
-    aci_rest:
-      hostname: "{{ apic_ip }}"
-      username: "{{ apic_username }}"
-      password: "{{ apic_password }}"
-      use_ssl: no
-      validate_certs: no
-      path: /api/mo/uni.xml
-      method: post
-      content: |
-        <fvTenant name="{{ Tenant }}">
-          <vzBrCP name="{{ Contract }}">
-            <vzSubj name="{{ subj_to_avi }}">
-              <vzRsSubjGraphAtt status="deleted" tnVnsAbsGraphName="{{ ServiceGraph }}"/>
-            </vzSubj>
-          </vzBrCP>
-        </fvTenant>
-    delegate_to: localhost
-
 # Detach VMs from ACI created Port-Groups
   - name: Detach front-end VMs from ACI PGs
     vmware_guest:
@@ -62,6 +42,11 @@
       - "{{ Backend_2 }}"
       - "{{ Backend_3 }}"
     delegate_to: localhost
+
+# Pause to make sure VMs had been detached before clearing the Distribued Port-Groups
+  - pause:
+      seconds: 5
+      prompt: "Pause to make sure VMs had been detached before deleting the Distribued Port-Groups"
 
 # Delete ACI Tenant
   - name: Delete ACI Tenant
