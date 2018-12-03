@@ -1,7 +1,7 @@
 # tenant variables
 # update accordingly
 
-# Segmentation parameters
+# Application Profile parameters
 Tenant: Demo
 AppProfile: PRD
 ClientEPG: Web
