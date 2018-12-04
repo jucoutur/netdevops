@@ -1,0 +1,14 @@
+---
+- import_playbook: 03_build_aci_tenant.yml
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - pause:
+      seconds: 2
+
+- import_playbook: 04_create_network_ranges.yml
+
+- import_playbook: 05_create_avi_application.yml
+
+- import_playbook: 06_attach_vms.yml
