@@ -1,0 +1,25 @@
+---
+# demo credentials and datas for avi controller, apic, vcenter
+# update accordingly
+
+# Avi credentials
+avi_controller: avi-controller.acifabric1.cisco.com
+avi_username: admin
+avi_password: C$sco123
+api_version: 18.1.3
+# 
+avi_credentials:
+  controller: avi-controller.acifabric1.cisco.com
+  username: admin
+  password: C$sco123
+  api_version: 18.1.3
+
+# APIC credentials
+apic_ip: apic-1.acifabric1.cisco.com
+apic_username: admin
+apic_password: cisco123
+
+# vCenter credentials
+vcenter_ip: vcenter.acifabric1.cisco.com
+vcenter_username: administrator@vsphere.local
+vcenter_password: C$sco123

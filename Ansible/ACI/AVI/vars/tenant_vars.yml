@@ -1,0 +1,63 @@
+---
+# Demo variables
+# update accordingly
+
+############
+# ACI vars #
+############
+# Application Profile vars
+Tenant: ACI_Day
+AppProfile: MyNewApp
+ClientEPG: Web
+ServerEPG: App
+# Networking vars
+vrf: MyVRF
+bd: MyBD
+bd_ip: 110.0.0.254/24
+bd_subnet: 110.0.0.0
+bd_subnet_mask: 24
+# Service Graph vars
+Contract: MyContract
+ServiceGraph: AviLayer2Graph
+subj_default: Default-Subject
+subj_to_avi: To-AVI-LB
+
+###############
+# VMware vars #
+###############
+# Global vars
+apic_VMM: DVS_Domain
+vcenter_dc: Datacenter
+vcenter_folder: AVI-Networks
+vcenter_vm_folder: /MyNewApp
+# Demo VMs
+Frontends:
+  - Web1
+Backends:
+  - App1
+  - App2
+
+##################
+# Avi parameters #
+##################
+# Global vars
+AviCloudName: Default-Cloud
+SEgroupname: Default-Group
+# Avi OOB mgmt network vars
+mgmt_network: 'VM Network'
+mgmt_subnet: 10.60.9.0
+mgmt_subnet_mask: 24
+mgmt_dgw: 10.60.9.254
+# network range for SE OOB mgmt legs
+mgmt_start_addr: 10.60.9.108
+mgmt_end_addr: 10.60.9.109
+# network range for SE tenant legs
+bd_subnet_start_addr: 110.0.0.200
+bd_subnet_end_addr: 110.0.0.210
+# App vars
+appaci_vip: 110.0.0.123
+app_name: MyNewApp-VS
+# 'avi_device' value is depends on YOUR Avi install. 
+# Let the line below empty and 'extract_avi_cluster_name.yml' playbook
+# will add it at the end of the YAML file when run
+avi_device: Avi_5dd858e6_29aa
