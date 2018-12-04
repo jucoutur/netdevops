@@ -1,10 +1,12 @@
 FROM phusion/baseimage:0.10.1
-LABEL maintainer="jucoutur@cisco.com"
+MAINTAINER Julien Couturier <jucoutur@cisco.com>
+# credits to Nicolas Delecroix <ndelecro@cisco.com> & Stef Benfredj <stefb12@gmail.com>
 
 CMD ["/bin/bash"]
 
 # Dependencies & tools
-RUN apt-get -y update && apt-get -y install \
+RUN apt-get -y update
+RUN apt-get -y install \
 	apt-utils \
 	dialog \
 	software-properties-common \
@@ -23,48 +25,30 @@ RUN apt-get -y update && apt-get -y install \
 	libtool-bin \
 	wget \
 	subversion
-RUN echo 'upgrade pip to latest' 
+
 RUN pip install --upgrade pip
-RUN pip install scp requests
+RUN pip install scp \
+	requests \
+	lxml \
+	xmljson \
+	pyvmomi \
+	avisdk
 
 # Ansible install
 RUN apt-add-repository -y ppa:ansible/ansible && apt-get update && apt-get install -y ansible
 
 # Avi Networks // install required packages, roles, sdk
-RUN pip install avisdk
-RUN git clone https://github.com/avinetworks/devops.git
-RUN ansible-galaxy install avinetworks.avisdk
-RUN ansible-galaxy install avinetworks.aviconfig
-RUN ansible-galaxy install avinetworks.avicontroller
-
-## ACI // install dependencies required when using aci_rest ansible module with XML payload
-RUN pip install lxml && pip install xmljson
-
-## VMware // install pyvmomi for vSphere automation
-RUN pip install pyvmomi
+RUN ansible-galaxy install avinetworks.avisdk avinetworks.aviconfig avinetworks.avicontroller
 
 # No caching from now on to always force latest files to be downloaded
 ADD http://worldclockapi.com/api/json/utc/now /tmp/timestamp.json
 
-# NX-OS // get NX-API CLI scripts
-RUN mkdir /root/NX-API_CLI && \
-	svn checkout "https://github.com/jucoutur/netdevops/trunk/NX-API_CLI" /root/NX-API_CLI
-
 # Ansible // create a base folder for playbooks
 RUN mkdir /root/ansible
-
-# NX-OS // get Ansible playbooks & Ansible config files
-RUN mkdir /root/ansible/nxos && \
-	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/2.5" /root/ansible/nxos && \
-	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/Config" /etc/ansible/
-
-# NX-OS // overwrite existing Ansible config files
-RUN	curl 'https://raw.githubusercontent.com/jucoutur/netdevops/master/Ansible/Config/hosts' > /etc/ansible/hosts  && \
-	curl 'https://raw.githubusercontent.com/jucoutur/netdevops/master/Ansible/Config/ansible.cfg' > /etc/ansible/ansible.cfg
 
 # ACI // get ACI-AVI Ansible playbooks
 RUN mkdir /root/ansible/aci && \
 	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/ACI" /root/ansible/aci
 
-# Clean up APT when done.
+# Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
