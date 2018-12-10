@@ -6,7 +6,7 @@
 # ACI vars #
 ############
 # Application Profile vars
-Tenant: ACI_Day
+Tenant: Demo
 AppProfile: MyNewApp
 ClientEPG: Web
 ServerEPG: App
