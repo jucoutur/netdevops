@@ -1,0 +1,75 @@
+---
+- name: Create L2VNI with L3 configuration, and put associated access ports in access or trunk mode
+  hosts: nxos_vteps_cli
+  gather_facts: false
+
+  vars_files:
+    - vars.yaml
+
+  tasks:
+
+    - name: Create VLAN/L2VNI
+      nxos_vlan:
+        vlan_id: "{{ net_vlan }}"
+        name: "{{ net_name }}"
+        mapped_vni: "{{ net_vni }}"
+        admin_state: up
+
+    - name: Configure access port
+      nxos_interface:
+        name: "{{ item }}"
+        mode: layer2
+        description: "{{ port_desc }}"
+        mtu: "{{ mtu }}"
+        admin_state: up
+      with_items: "{{ access_ports }}"
+
+    - name: Configure l2 interface port as access # run only if 'port_mode' is set to access
+      nxos_l2_interface:
+        name: "{{ item }}"
+        mode: "{{ port_mode }}"
+        access_vlan: "{{ net_vlan }}"
+      with_items: "{{ access_ports }}"
+      when: port_mode == "access"
+
+    - name: Configure l2 interface port as trunk # run only if 'port_mode' is set to trunk
+      nxos_l2_interface:
+        name: "{{ item }}"
+        mode: "{{ port_mode }}"
+        trunk_vlans: "{{ net_vlan }}"
+      with_items: "{{ access_ports }}"
+      when: port_mode == "trunk"
+
+    - name: Add L2VNI to EVPN (control plane)
+      nxos_evpn_vni:
+        vni: "{{ net_vni }}"
+        route_distinguisher: auto
+        route_target_both: auto
+
+    - name: Add L2VNI to NVE interface (data plane)
+      nxos_vxlan_vtep_vni:
+        interface: nve1
+        vni: "{{ net_vni }}"
+        multicast_group: "{{ net_mgroup }}"
+        suppress_arp: true
+
+    - name: Create SVI # run only if 'net_is_l3' is set to 'true'
+      nxos_interface:
+        name: "Vlan{{ net_vlan }}"
+        description: "{{ net_name }}-SVI"
+        fabric_forwarding_anycast_gateway: yes
+        mtu: "{{ mtu }}"
+        admin_state: up
+      when: net_is_l3
+
+    - name: Associate SVI to VRF # run only if 'net_is_l3' is set to 'true'
+      nxos_vrf_interface:
+        interface: "Vlan{{ net_vlan }}"
+        vrf: "{{ vrf_name }}"
+      when: net_is_l3
+
+    - name: Configure SVI IP subnet # run only if 'net_is_l3' is set to 'true'
+      nxos_l3_interface:
+        name: "Vlan{{ net_vlan }}"
+        ipv4: "{{ net_subnet }}"
+      when: net_is_l3
