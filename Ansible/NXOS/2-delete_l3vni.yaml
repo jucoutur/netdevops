@@ -12,6 +12,12 @@
         safi: unicast 
         state: absent
 
+    - name: Remove VRF from BGP (control plane)
+      nxos_bgp:
+        asn: "{{ fabric_asn }}"
+        vrf: "{{ vrf_name }}-{{ vrf_vni }}"
+        state: absent
+
     - name: Remove L3VNI from NVE interface (data plane)
       nxos_vxlan_vtep_vni:
         interface: nve1
