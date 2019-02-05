@@ -50,5 +50,9 @@ RUN mkdir /root/ansible
 RUN mkdir /root/ansible/aci && \
 	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/ACI" /root/ansible/aci
 
+# ACI // get NX-OS Ansible playbooks for VXLAN-EVPN overlay provisioning
+RUN mkdir /root/ansible/nxos && mkdir /root/ansible/nxos/vxlan-evpn-overlay && \
+	svn checkout "https://github.com/jucoutur/netdevops/trunk/Ansible/NXOS" /root/ansible/nxos/vxlan-evpn-overlay
+
 # Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
