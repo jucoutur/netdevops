@@ -2,16 +2,12 @@
 - name: Remove L3VNI
   hosts: nxos_vteps_cli
   gather_facts: false
-
-  vars_files:
-    - vars.yaml
-
   tasks:
 
     - name: Remove VRF from VPNv4 (control plane)
       nxos_bgp_af:
         asn: "{{ fabric_asn }}"
-        vrf: "{{ vrf_name }}"
+        vrf: "{{ vrf_name }}-{{ vrf_vni }}"
         afi: ipv4
         safi: unicast 
         state: absent
@@ -29,7 +25,7 @@
 
     - name: Delete VRF/L3VNI
       nxos_vrf:
-        name: "{{ vrf_name }}"
+        name: "{{ vrf_name }}-{{ vrf_vni }}"
         state: absent
 
     - name: Delete VLAN/L3VNI
